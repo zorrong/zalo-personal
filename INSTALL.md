@@ -121,7 +121,11 @@ openclaw gateway restart
 ## Uninstall
 
 ```bash
-openclaw ext remove zalo-personal
+# Disable plugin
+openclaw plugins disable zalo-personal
+
+# Remove files
+rm -rf ~/.openclaw/extensions/zalo-personal
 ```
 
 ---

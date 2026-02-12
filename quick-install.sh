@@ -32,6 +32,7 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
     read -p "Bạn có muốn cài đặt lại? [y/N]: " reinstall
     if [[ "$reinstall" =~ ^[Yy]$ ]]; then
         echo "🗑️  Xóa version cũ..."
+        openclaw plugins disable zalo-personal 2>/dev/null || true
         rm -rf "$HOME/.openclaw/extensions/zalo-personal"
         openclaw plugins install zalo-personal
         if [ $? -ne 0 ]; then
