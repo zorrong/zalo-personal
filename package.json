@@ -29,8 +29,8 @@
     "*.md",
     "*.sh",
     "*.js",
-    "index.ts",
-    "package.json"
+    "*.json",
+    "index.ts"
   ],
   "scripts": {
     "prepublishOnly": "echo 'Ready to publish!'"
