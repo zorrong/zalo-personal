@@ -1,0 +1,9 @@
+{
+  "id": "zalo-personal",
+  "channels": ["zalo-personal"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

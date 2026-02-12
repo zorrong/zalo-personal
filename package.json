@@ -1,0 +1,70 @@
+{
+  "name": "zalo-personal",
+  "version": "1.0.0",
+  "description": "OpenClaw extension for Zalo Personal Account via zca-js library. Login via QR code, no CLI tools needed. Works with OpenClaw 2026.2+",
+  "type": "module",
+  "main": "./index.ts",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "keywords": [
+    "openclaw",
+    "openclaw-extension",
+    "zalo",
+    "zalo-personal",
+    "vietnam",
+    "messaging",
+    "chatbot",
+    "qr-login"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/zalo-personal"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/zalo-personal/issues"
+  },
+  "homepage": "https://github.com/your-username/zalo-personal#readme",
+  "files": [
+    "src/",
+    "*.md",
+    "*.sh",
+    "index.ts",
+    "package.json"
+  ],
+  "scripts": {
+    "prepublishOnly": "echo 'Ready to publish!'"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.2.0"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "0.34.48",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
+    "qrcode-terminal": "^0.12.0",
+    "zca-js": "^2.0.4",
+    "zod": "^4.3.6"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "zalo-personal",
+      "label": "Zalo Personal",
+      "selectionLabel": "Zalo Personal Account",
+      "docsPath": "/channels/zalo-personal",
+      "docsLabel": "zalo-personal",
+      "blurb": "Zalo personal account via zca-js library (no CLI needed).",
+      "aliases": [
+        "zp"
+      ],
+      "order": 86,
+      "quickstartAllowFrom": true
+    },
+    "install": {
+      "localPath": "extensions/zalo-personal",
+      "defaultChoice": "local"
+    }
+  }
+}
