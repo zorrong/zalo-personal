@@ -47,7 +47,13 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
                 echo "🧹 Clean install - Xóa và cài lại từ đầu"
                 echo ""
 
-                # Step 1: Clean old config
+                # Step 1: Disable plugin first
+                echo "🗑️  Disable plugin..."
+                cd /tmp  # Change to safe directory
+                openclaw plugins disable zalo-personal 2>/dev/null || true
+                echo ""
+
+                # Step 2: Clean old config
                 if [ -f "$CONFIG_FILE" ]; then
                     echo "🧹 Đang dọn dẹp config cũ..."
 
@@ -83,15 +89,13 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
                     echo ""
                 fi
 
-                # Step 2: Remove old plugin
-                echo "🗑️  Xóa plugin cũ..."
-                cd /tmp  # Change to safe directory
-                openclaw plugins disable zalo-personal 2>/dev/null || true
+                # Step 3: Remove plugin files
+                echo "🗑️  Xóa plugin files..."
                 rm -rf "$HOME/.openclaw/extensions/zalo-personal"
-                echo "✅ Đã xóa plugin cũ"
+                echo "✅ Đã xóa plugin files"
                 echo ""
 
-                # Step 3: Restart gateway
+                # Step 4: Restart gateway
                 echo "🔄 Đang restart gateway..."
                 openclaw gateway restart
                 echo "   ⏳ Đợi 5 giây..."
