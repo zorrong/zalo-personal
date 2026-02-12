@@ -1,16 +1,18 @@
 #!/bin/bash
-# Zalo Personal Extension - Quick Install Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh | bash
+# Clean config and install zalo-personal extension
+# Usage: bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/clean-and-install.sh)
 
 set -e
 
 echo ""
 echo "╔═══════════════════════════════════════════════════════════╗"
-echo "║     🚀 Zalo Personal Extension - Quick Install           ║"
+echo "║   🧹 Zalo Personal - Clean Config & Fresh Install       ║"
 echo "╚═══════════════════════════════════════════════════════════╝"
 echo ""
 
-# Check if openclaw is installed
+CONFIG_FILE="$HOME/.openclaw/openclaw.json"
+
+# Check if OpenClaw is installed
 if ! command -v openclaw &> /dev/null; then
     echo "❌ OpenClaw chưa được cài đặt!"
     echo "📥 Cài OpenClaw trước: npm install -g openclaw"
@@ -20,40 +22,89 @@ fi
 echo "✅ OpenClaw detected"
 echo ""
 
-# Step 1: Install extension
-echo "📦 Đang cài đặt extension zalo-personal..."
+# Step 1: Clean old config references
+if [ -f "$CONFIG_FILE" ]; then
+    echo "🧹 Đang dọn dẹp config cũ..."
+
+    # Backup config
+    cp "$CONFIG_FILE" "$CONFIG_FILE.backup-$(date +%s)"
+    echo "   📋 Backup created: $CONFIG_FILE.backup-*"
+
+    # Clean using Node.js
+    node -e "
+    const fs = require('fs');
+    const path = '$CONFIG_FILE';
+
+    try {
+      const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+      // Remove zalo-personal from channels
+      if (config.channels && config.channels['zalo-personal']) {
+        delete config.channels['zalo-personal'];
+        console.log('   ✓ Removed channels.zalo-personal');
+      }
+
+      // Remove zalo-personal from plugins.entries
+      if (config.plugins && config.plugins.entries && config.plugins.entries['zalo-personal']) {
+        delete config.plugins.entries['zalo-personal'];
+        console.log('   ✓ Removed plugins.entries.zalo-personal');
+      }
+
+      fs.writeFileSync(path, JSON.stringify(config, null, 2));
+      console.log('   ✅ Config cleaned!');
+    } catch (error) {
+      console.error('   ⚠️  Warning: Could not clean config:', error.message);
+    }
+    "
+
+    echo ""
+else
+    echo "⚠️  Config file not found, will be created during setup"
+    echo ""
+fi
+
+# Step 2: Remove old plugin if exists
+if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
+    echo "🗑️  Xóa plugin cũ..."
+    # Change to safe directory before removing
+    cd /tmp
+    openclaw plugins disable zalo-personal 2>/dev/null || true
+    rm -rf "$HOME/.openclaw/extensions/zalo-personal"
+    echo "✅ Đã xóa plugin cũ"
+    echo ""
+
+    # Restart gateway to unload plugin
+    echo "🔄 Đang restart gateway..."
+    openclaw gateway restart
+    echo "   ⏳ Đợi gateway khởi động..."
+    sleep 5
+    echo "✅ Gateway đã restart"
+    echo ""
+fi
+
+# Step 3: Run installation
+echo "📦 Đang cài đặt zalo-personal (latest version)..."
 echo "⚠️  Có thể xuất hiện warning về 'dangerous code patterns' - điều này bình thường"
 echo "    (Extension cần quyền restart gateway)"
 echo ""
 
-# Check if already installed
-if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
-    echo "⚠️  Extension đã được cài đặt!"
-    read -p "Bạn có muốn cài đặt lại? [y/N]: " reinstall
-    if [[ "$reinstall" =~ ^[Yy]$ ]]; then
-        echo "🗑️  Xóa version cũ..."
-        openclaw plugins disable zalo-personal 2>/dev/null || true
-        rm -rf "$HOME/.openclaw/extensions/zalo-personal"
-        openclaw plugins install zalo-personal
-        if [ $? -ne 0 ]; then
-            echo "❌ Cài đặt thất bại!"
-            exit 1
-        fi
-    else
-        echo "✅ Sử dụng extension hiện có"
-    fi
-else
-    openclaw plugins install zalo-personal
-    if [ $? -ne 0 ]; then
-        echo "❌ Cài đặt thất bại!"
-        exit 1
-    fi
-    echo "✅ Cài đặt extension thành công!"
+openclaw plugins install zalo-personal
+
+if [ $? -ne 0 ]; then
+    echo "❌ Cài đặt thất bại!"
+    echo ""
+    echo "🔍 Có thể thử:"
+    echo "  1. Kiểm tra internet connection"
+    echo "  2. Xem log: openclaw logs"
+    echo "  3. Báo lỗi: https://github.com/caochitam/zalo-personal/issues"
+    exit 1
 fi
 
 echo ""
+echo "✅ Cài đặt extension thành công!"
+echo ""
 
-# Step 2: Choose mode
+# Step 4: Choose mode
 echo "🔧 Chọn chế độ hoạt động:"
 echo ""
 echo "  [1] Open Mode - Nhận tin nhắn từ mọi người (khuyến nghị cho test)"
@@ -81,18 +132,8 @@ echo ""
 echo "✅ Đã chọn: $MODE mode"
 echo ""
 
-# Step 3: Configure channel
-CONFIG_FILE="$HOME/.openclaw/openclaw.json"
-
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "❌ Không tìm thấy file config: $CONFIG_FILE"
-    exit 1
-fi
-
+# Step 5: Configure channel
 echo "🔧 Đang cấu hình channel..."
-
-# Backup config
-cp "$CONFIG_FILE" "$CONFIG_FILE.backup"
 
 # Get extension directory
 EXT_DIR="$HOME/.openclaw/extensions/zalo-personal"
@@ -104,9 +145,10 @@ if [ $? -ne 0 ]; then
     echo "❌ Cấu hình thất bại!"
     exit 1
 fi
+
 echo ""
 
-# Step 4: Login with QR
+# Step 6: Login with QR
 echo "🔐 Đăng nhập Zalo..."
 echo "📱 Mở app Zalo > QR icon > Quét mã QR bên dưới"
 echo ""
@@ -123,7 +165,7 @@ echo ""
 echo "✅ Đăng nhập thành công!"
 echo ""
 
-# Step 5: Restart gateway
+# Step 7: Restart gateway
 echo "🔄 Đang khởi động lại gateway để nhận certificate..."
 openclaw gateway restart
 

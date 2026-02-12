@@ -8,7 +8,7 @@ const os = require('os');
 const mode = process.argv[2]; // 'open' or 'pairing'
 
 if (!mode || !['open', 'pairing'].includes(mode)) {
-  console.error('Usage: node config-helper.js <open|pairing>');
+  console.error('Usage: node config-helper.cjs <open|pairing>');
   process.exit(1);
 }
 

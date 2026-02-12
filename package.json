@@ -29,6 +29,7 @@
     "*.md",
     "*.sh",
     "*.js",
+    "*.cjs",
     "*.json",
     "index.ts"
   ],
