@@ -22,14 +22,34 @@ echo ""
 
 # Step 1: Install extension
 echo "📦 Đang cài đặt extension zalo-personal..."
-openclaw ext add zalo-personal
+echo "⚠️  Có thể xuất hiện warning về 'dangerous code patterns' - điều này bình thường"
+echo "    (Extension cần quyền restart gateway)"
+echo ""
 
-if [ $? -ne 0 ]; then
-    echo "❌ Cài đặt thất bại!"
-    exit 1
+# Check if already installed
+if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
+    echo "⚠️  Extension đã được cài đặt!"
+    read -p "Bạn có muốn cài đặt lại? [y/N]: " reinstall
+    if [[ "$reinstall" =~ ^[Yy]$ ]]; then
+        echo "🗑️  Xóa version cũ..."
+        rm -rf "$HOME/.openclaw/extensions/zalo-personal"
+        openclaw plugins install zalo-personal
+        if [ $? -ne 0 ]; then
+            echo "❌ Cài đặt thất bại!"
+            exit 1
+        fi
+    else
+        echo "✅ Sử dụng extension hiện có"
+    fi
+else
+    openclaw plugins install zalo-personal
+    if [ $? -ne 0 ]; then
+        echo "❌ Cài đặt thất bại!"
+        exit 1
+    fi
+    echo "✅ Cài đặt extension thành công!"
 fi
 
-echo "✅ Cài đặt extension thành công!"
 echo ""
 
 # Step 2: Choose mode
@@ -91,7 +111,7 @@ echo "📱 Mở app Zalo > QR icon > Quét mã QR bên dưới"
 echo ""
 
 # Run login command
-openclaw channel login zalo-personal
+openclaw channels login --channel zalo-personal
 
 if [ $? -ne 0 ]; then
     echo "❌ Đăng nhập thất bại!"
@@ -120,10 +140,10 @@ echo "📖 Kiểm tra status:"
 echo "  openclaw status"
 echo ""
 echo "💬 Gửi tin thử:"
-echo "  openclaw send -c zalo-personal -to YOUR_USER_ID \"Hello!\""
+echo "  openclaw message send --channel zalo-personal --target YOUR_USER_ID --message \"Hello!\""
 echo ""
-echo "🔍 Xem User ID của bạn:"
-echo "  openclaw channel status zalo-personal"
+echo "🔍 Xem thông tin channel:"
+echo "  openclaw channels list"
 echo ""
 
 if [ "$MODE" = "pairing" ]; then
