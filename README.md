@@ -2,9 +2,25 @@
 
 > Connect your personal Zalo account to OpenClaw via QR code login
 
+## 🚀 One-Liner Installation
+
+Copy-paste this into your terminal:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
+```
+
+**That's it!** The script will:
+1. Install the extension
+2. Let you choose Open or Pairing mode
+3. Show QR code for login
+4. Auto-restart gateway
+
+---
+
 ## Quick Start
 
-### Easy Setup (Recommended)
+### Easy Setup (Recommended - If Already Installed)
 
 ```bash
 # Option 1: Pairing Mode (Secure - requires approval)

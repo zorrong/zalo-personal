@@ -28,6 +28,7 @@
     "src/",
     "*.md",
     "*.sh",
+    "*.js",
     "index.ts",
     "package.json"
   ],
