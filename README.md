@@ -1,95 +1,103 @@
 # Zalo Personal Channel Extension
 
-> Connect your personal Zalo account to OpenClaw via QR code login
+> Kết nối tài khoản Zalo cá nhân với OpenClaw qua đăng nhập QR code
 
-## 🚀 One-Liner Installation
+## 🚀 Cài Đặt Nhanh (One-Liner)
 
-Copy-paste this into your terminal:
+Copy-paste lệnh này vào terminal:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
 ```
 
-**That's it!** The script will:
-1. Install the extension
-2. Let you choose Open or Pairing mode
-3. Show QR code for login
-4. Auto-restart gateway
+**Xong!** Script sẽ tự động:
+1. Cài đặt extension
+2. Cho bạn chọn chế độ Open hoặc Pairing
+3. Hiển thị QR code để đăng nhập
+4. Tự động restart gateway
 
 ---
 
-## Quick Start
+## Bắt Đầu Nhanh
 
-### Already Installed?
+### Đã Cài Rồi?
 
-Re-run the quick install script to reconfigure, update, or reinstall:
+Chạy lại script để cấu hình lại, cập nhật, hoặc cài lại:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
 ```
 
-It will detect existing installation and ask if you want to:
-- **Use existing extension** (just reconfigure)
-- **Update to latest version** (safe in-place update)
-- **Clean install** (remove and reinstall)
+Script sẽ phát hiện cài đặt hiện tại và hỏi bạn muốn:
+- **Dùng extension hiện có** (chỉ cấu hình lại)
+- **Cập nhật lên phiên bản mới nhất** (update an toàn)
+- **Cài lại từ đầu** (xóa và cài mới)
 
-### Manual Login
+### Đăng Nhập Thủ Công
 
-If already configured, just login:
+Nếu đã cấu hình xong, chỉ cần đăng nhập:
 
 ```bash
-# Login to Zalo Personal
+# Đăng nhập Zalo Personal
 openclaw channels login --channel zalo-personal
 
-# Or use alias
+# Hoặc dùng alias ngắn
 openclaw channels login --channel zp
 ```
 
-### Updating
+### Cập Nhật
 
-Update to the latest version with one command:
+Cập nhật lên phiên bản mới nhất bằng một lệnh:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/update.sh)
 ```
 
-The update script will:
-- ✅ Check current version vs latest
-- ✅ Create automatic backup
-- ✅ Download and install latest from npm
-- ✅ Preserve your configuration
-- ✅ Prompt to restart gateway
+Script cập nhật sẽ:
+- ✅ Kiểm tra phiên bản hiện tại vs mới nhất
+- ✅ Tạo backup tự động trong `/tmp`
+- ✅ Tải và cài đặt phiên bản mới từ npm
+- ✅ Giữ nguyên cấu hình của bạn
+- ✅ Hỏi restart gateway
 
-**Or** use the quick install script (option 2):
+**Hoặc** dùng script cài đặt nhanh (chọn option 2):
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
-# Then choose [2] Update to latest version
+# Sau đó chọn [2] Update to latest version
 ```
 
-## Features
+---
 
-- ✅ **QR Code Login** - No CLI tools needed, uses `zca-js` library
-- ✅ **Auto Cleanup** - QR image automatically deleted after login
-- ✅ **Gateway Restart** - Optional restart prompt for certificate recognition
-- ✅ **Pairing Mode** - Control who can message your bot
-- ✅ **Group Support** - Works with both DMs and group chats
-- ✅ **Stable & Reliable** - Built on battle-tested zca-js library
+## Tính Năng
 
-## Login Process
+- ✅ **Đăng nhập QR Code** - Không cần CLI tools, dùng thư viện `zca-js`
+- ✅ **Tự động dọn dẹp** - QR image tự động xóa sau khi đăng nhập
+- ✅ **Restart Gateway** - Hỏi restart để nhận diện certificate
+- ✅ **Chế độ Pairing** - Kiểm soát ai được nhắn tin với bot
+- ✅ **Hỗ trợ Nhóm** - Hoạt động với cả tin nhắn riêng và nhóm
+- ✅ **Blocklist/Denylist** - Chặn người dùng không mong muốn
+- ✅ **Ổn định & Tin cậy** - Xây dựng trên thư viện zca-js đã kiểm nghiệm
 
-1. Run login command
-2. QR code displayed in terminal
-3. Scan with Zalo app on phone
-4. Confirm on phone
-5. ✓ Login successful!
-6. QR image auto-deleted
-7. Optional: Restart gateway
+---
 
-## Security Modes
+## Quy Trình Đăng Nhập
 
-### Pairing (Recommended)
-Users request pairing → You approve → They can message
+1. Chạy lệnh đăng nhập
+2. QR code hiển thị trong terminal
+3. Quét bằng app Zalo trên điện thoại
+4. Xác nhận trên điện thoại
+5. ✓ Đăng nhập thành công!
+6. QR image tự động xóa
+7. Tùy chọn: Restart gateway
+
+---
+
+## Chế Độ Bảo Mật
+
+### Pairing (Khuyến nghị)
+
+User yêu cầu pairing → Bạn chấp nhận → Họ có thể nhắn tin
 
 ```yaml
 channels:
@@ -97,32 +105,46 @@ channels:
     dmPolicy: pairing
 ```
 
-### Allowlist
-Only specific users can message
+**Cách sử dụng:**
+1. User gửi tin nhắn lần đầu → Bot yêu cầu pair
+2. Bạn reply tin nhắn của bot để approve
+3. ✓ User có thể nhắn tin với bot
+
+### Allowlist (Danh sách cho phép)
+
+Chỉ những người cụ thể mới được nhắn tin
 
 ```yaml
 channels:
   zalo-personal:
     dmPolicy: allowlist
     allowFrom:
-      - "123456789"
+      - "Alice"           # Tên hiển thị
+      - "0987654321"      # Số điện thoại
+      - "Bob Nguyễn"
 ```
 
-### Open
-Anyone can message (use with caution!)
+**Lưu ý:** Tên phải khớp chính xác với tên hiển thị trong Zalo
+
+### Open (Mở cửa)
+
+Nhận tin nhắn từ mọi người
 
 ```yaml
 channels:
   zalo-personal:
     dmPolicy: open
-    allowFrom: ["*"]
 ```
 
-## Blocklist (Denylist) Features
+**Cảnh báo:** Chế độ này cho phép bất kỳ ai nhắn tin với bot. Chỉ dùng để test hoặc bot công khai.
 
-### Block Individual Users Globally
+---
 
-Prevent specific users from messaging your bot in any context (DMs and groups):
+## Blocklist (Chặn Người Dùng)
+
+### Chặn User Toàn Cục
+
+Chặn người dùng trong mọi ngữ cảnh (DM và nhóm):
 
 ```yaml
 channels:
@@ -130,199 +152,296 @@ channels:
     dmPolicy: open
     allowFrom: ["*"]
     denyFrom:
-      - "Spam User"        # Block by name (auto-resolved to ID)
-      - "123456789"        # Block by numeric ID
-```
-
-### Block Users in Specific Groups
-
-Allow a group but block specific members within that group:
-
-```yaml
-channels:
-  zalo-personal:
-    groupPolicy: allowlist
-    groups:
-      "Work Chat":
-        allow: true
-        denyUsers:
-          - "Bob"           # Bob can't trigger bot in this group
-          - "987654321"     # Block by ID
-      "Friends Group":
-        allow: true
-        # No denyUsers - everyone can use bot here
-```
-
-### Block Entire Groups
-
-Simply don't add the group to your `groups` config, or set `allow: false`:
-
-```yaml
-channels:
-  zalo-personal:
-    groupPolicy: allowlist
-    groups:
-      "Spam Group":
-        allow: false       # Block entire group
-```
-
-### Precedence Rules
-
-**Deny ALWAYS wins over allow:**
-- User in both `allowFrom` and `denyFrom` → BLOCKED
-- User allowed globally but in `denyUsers` for a group → BLOCKED in that group
-- Wildcard `*` in `allowFrom` but specific users in `denyFrom` → Those users BLOCKED
-
-### Configuration Example: Mixed Allow/Deny
-
-```yaml
-channels:
-  zalo-personal:
-    dmPolicy: open
-    allowFrom: ["*"]       # Allow everyone by default
-    denyFrom:
-      - "Spammer"          # Except this user
+      - "Tên Spam User"    # Tự động resolve sang ID
+      - "123456789"        # Hoặc dùng ID trực tiếp
       - "Troll Account"
+```
+
+### Chặn User Trong Nhóm Cụ Thể
+
+Chặn người dùng chỉ trong một nhóm nhất định:
+
+```yaml
+channels:
+  zalo-personal:
     groupPolicy: allowlist
     groups:
-      "Public Group":
+      "Nhóm Công Việc":
         allow: true
         denyUsers:
-          - "BadActor"     # Block specific user in this group
-      "Private Group":
-        allow: true        # No blocks, everyone in group can use bot
+          - "Bob"           # Bob bị chặn chỉ trong nhóm này
+          - "987654321"
 ```
 
-### Name Resolution
+### Quy Tắc Ưu Tiên
 
-- Bot automatically resolves names to IDs at startup
-- Use friendly names instead of managing numeric IDs
-- Unresolved names are logged as warnings (bot continues to work)
-- Numeric IDs work directly without resolution
+- **Deny LUÔN thắng Allow** - Security-first
+- User trong cả `allowFrom` và `denyFrom` → **BỊ CHẶN**
+- Wildcard `"*"` trong allowFrom + cụ thể trong denyFrom → Những user đó BỊ CHẶN
 
-## Quick Commands
+### Ví Dụ: Kết Hợp Allow/Deny
 
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]       # Cho phép tất cả
+    denyFrom:
+      - "Spammer"          # Trừ những người này
+      - "BadActor"
+    groupPolicy: allowlist
+    groups:
+      "Nhóm Công Khai":
+        allow: true
+        denyUsers:
+          - "Charlie"      # Charlie bị chặn trong nhóm này
+```
+
+### Resolve Tên Tự Động
+
+Extension tự động resolve tên thân thiện sang ID:
+- Tìm trong danh sách bạn bè khi khởi động
+- Hiển thị log: `Name→ID` khi resolve thành công
+- Cảnh báo nếu không tìm thấy tên
+
+**Lưu ý:** Restart gateway sau khi thay đổi blocklist để áp dụng:
 ```bash
-# Login/Logout
-openclaw channels login --channel zp
-openclaw channels logout --channel zp
-
-# Status
-openclaw status
-
-# Pairing management
-openclaw pairing list
-openclaw pairing approve zalo-personal <code>
-openclaw pairing reject zalo-personal <code>
-
-# Gateway
 openclaw gateway restart
-openclaw logs --follow
 ```
 
-## Uninstall
+---
 
-To completely remove the extension:
+## Quản Lý Blocklist Qua AI Tool
+
+Bot có thể tự quản lý blocklist thông qua AI tool:
+
+```
+User: "Chặn user Bob đi"
+AI: *calls tool* { action: "block-user", userId: "Bob" }
+Bot: ✅ User Bob (ID: 123456) đã bị chặn toàn cục
+     ⚠️ Restart gateway để áp dụng: openclaw gateway restart
+```
+
+### Tool Actions Có Sẵn
+
+- `block-user` - Chặn user toàn cục
+- `unblock-user` - Bỏ chặn user toàn cục
+- `block-user-in-group` - Chặn user trong nhóm cụ thể
+- `unblock-user-in-group` - Bỏ chặn user trong nhóm
+- `list-blocked` - Xem danh sách user bị chặn
+- `list-allowed` - Xem danh sách user được phép
+
+Tất cả actions đều hỗ trợ resolve tên tự động.
+
+---
+
+## Cấu Hình Nâng Cao
+
+### Cho Phép Nhóm Cụ Thể
+
+```yaml
+channels:
+  zalo-personal:
+    groupPolicy: allowlist
+    groups:
+      "Nhóm Team":
+        allow: true
+        enabled: true
+      "Nhóm Gia Đình":
+        allow: true
+```
+
+### Chặn Cả Nhóm
+
+```yaml
+channels:
+  zalo-personal:
+    groups:
+      "Nhóm Spam":
+        allow: false      # Chặn toàn bộ nhóm này
+```
+
+### Tool Policy Theo Người Gửi
+
+```yaml
+channels:
+  zalo-personal:
+    groups:
+      "Nhóm Admin":
+        allow: true
+        tools:
+          bySender:
+            "Admin User":
+              allow: ["*"]  # Admin được dùng tất cả tools
+            "Regular User":
+              deny: ["bash", "write"]  # User thường bị giới hạn
+```
+
+---
+
+## Gỡ Cài Đặt
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/uninstall.sh)
 ```
 
-This will:
-- Logout from channel
+Script sẽ:
+- Logout khỏi channel
 - Disable plugin
-- Remove all files
-- Clean up configuration
-- Optionally restart gateway
-
-## Documentation
-
-📖 **[Quick Reference (Vietnamese)](./QUICK-REFERENCE.vi.md)** - Tài liệu tra cứu nhanh
-📖 **[Installation Guide (Vietnamese)](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
-
-## Requirements
-
-- OpenClaw 2026.2.9 or later
-- Node.js (bundled with OpenClaw)
-- Zalo app on phone
-
-## Configuration Example
-
-```yaml
-channels:
-  zalo-personal:
-    enabled: true
-    dmPolicy: pairing
-    groupPolicy: open
-```
-
-## Troubleshooting
-
-### QR Code not showing
-Check: `ls -lh /tmp/openclaw-zalo-personal-qr.png`
-
-### Login failed
-```bash
-openclaw channels logout --channel zp
-openclaw channels login --channel zp
-```
-
-### Channel shows "failed"
-```bash
-openclaw gateway restart
-```
-
-### Can't resolve username to User ID
-Use **pairing mode** instead of allowlist, or use numeric User IDs directly.
-
-### User still getting through despite denyFrom
-1. Check logs: `openclaw logs --follow`
-2. Verify name resolution in startup logs
-3. Use numeric ID if name doesn't resolve
-4. Restart gateway: `openclaw gateway restart`
-
-## Support
-
-- 📚 [OpenClaw Docs](https://docs.openclaw.ai/)
-- 🐛 [GitHub Issues](https://github.com/openclaw/openclaw/issues)
-- 💬 [Discord Community](https://discord.gg/openclaw)
-
-## 👥 Join Zalo Community
-
-Tham gia nhóm Zalo để:
-- 💬 Thảo luận và hỗ trợ lẫn nhau
-- 🐛 Báo lỗi và request tính năng mới
-- 📣 Cập nhật phiên bản mới nhất
-- 🤝 Kết nối với cộng đồng OpenClaw VN
-
-<p align="center">
-  <a href="https://zalo.me/g/zgictz077">
-    <img src="./zalo-group.jpg" alt="Join Zalo Group" width="300"/>
-  </a>
-</p>
-
-**Link:** https://zalo.me/g/zgictz077
-
-## What's New
-
-### v1.0.7 (2026-02-13)
-- ✅ Smart detection and cleanup of failed installations
-- ✅ Unified `quick-install.sh` script handles all scenarios
-- ✅ Auto-cleanup stale config from previous failed installs
-- ✅ Interactive mode selection (Open/Pairing)
-
-### v1.0.0 (2026-02-12)
-- ✅ Auto-delete QR image after successful login
-- ✅ Display QR file path during login
-- ✅ Optional gateway restart prompt
-- ✅ Cleanup on login failure
-
-## License
-
-Part of the OpenClaw project
+- Xóa extension directory
+- Dọn dẹp config
+- Hỏi restart gateway
 
 ---
 
-**Version**: 1.0.9
-**OpenClaw**: 2026.2.9+
-**Last Updated**: 2026-02-13
+## Troubleshooting
+
+### QR Code Không Hiển Thị
+
+```bash
+# Kiểm tra package đã cài chưa
+npm list -g qrcode-terminal
+
+# Cài lại nếu thiếu
+npm install -g qrcode-terminal
+```
+
+### Đăng Nhập Thất Bại
+
+```bash
+# Xóa credentials cũ
+rm -rf ~/.openclaw/extensions/zalo-personal/credentials
+
+# Thử đăng nhập lại
+openclaw channels login --channel zp
+```
+
+### Tin Nhắn Không Được Xử Lý
+
+1. Kiểm tra logs: `openclaw logs --follow`
+2. Verify dmPolicy/groupPolicy settings
+3. Kiểm tra allowFrom/denyFrom lists
+4. Restart gateway: `openclaw gateway restart`
+
+### User Vẫn Nhắn Tin Được Dù Đã Chặn
+
+1. Kiểm tra logs khi khởi động để xem name resolution
+2. Verify tên khớp chính xác với tên hiển thị
+3. Dùng ID số nếu tên không resolve được
+4. Restart gateway sau khi sửa config
+
+### Cập Nhật Thất Bại
+
+Nếu script update fail:
+
+```bash
+# Kiểm tra backups trong /tmp
+ls -lah /tmp/zalo-personal-backup-*
+
+# Khôi phục từ backup mới nhất
+cd ~/.openclaw/extensions/
+rm -rf zalo-personal
+mv /tmp/zalo-personal-backup-YYYYMMDD-HHMMSS zalo-personal
+openclaw gateway restart
+```
+
+**Lưu ý:** Backup trong `/tmp` tự động xóa sau reboot
+
+---
+
+## Phát Triển
+
+### Cài Đặt Local
+
+```bash
+git clone https://github.com/caochitam/zalo-personal.git
+cd zalo-personal
+npm install
+openclaw plugins install .
+```
+
+### Testing
+
+```bash
+# Test login
+openclaw channels login --channel zp
+
+# Test messaging
+openclaw channels send --channel zp --to "USER_ID" --message "Test"
+
+# Monitor logs
+openclaw logs --follow
+```
+
+---
+
+## Tech Stack
+
+- **zca-js** - Unofficial Zalo API library
+- **OpenClaw** - AI messaging gateway platform
+- **TypeScript** - Type-safe development
+- **Node.js** - Runtime environment
+
+---
+
+## Đóng Góp
+
+Contributions are welcome!
+
+1. Fork repo
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Open Pull Request
+
+---
+
+## License
+
+MIT License - xem [LICENSE](LICENSE) để biết chi tiết
+
+---
+
+## Liên Hệ
+
+- **Issues:** https://github.com/caochitam/zalo-personal/issues
+- **Discussions:** https://github.com/caochitam/zalo-personal/discussions
+- **Email:** caochitam@gmail.com
+
+---
+
+## Changelog
+
+### v1.1.2 (Latest)
+- 🔧 Move backup to `/tmp` for auto cleanup after reboot
+- 🔧 Better UX for update script
+
+### v1.1.1
+- ✨ Add safe shell-based update mechanism
+- ✨ Update option in quick-install script
+- 📚 Comprehensive update documentation
+
+### v1.1.0
+- ✨ Blocklist/denylist features (global + group-specific)
+- ✨ AI tool for blocklist management
+- ✨ Automatic name→ID resolution
+- 📚 Vietnamese documentation
+
+### v1.0.9
+- 🐛 Bug fixes and stability improvements
+- 📚 Documentation updates
+
+---
+
+## Tài Liệu Khác
+
+- 🇬🇧 [README.en.md](README.en.md) - English documentation
+- 📖 [INSTALL.md](INSTALL.md) - Hướng dẫn cài đặt nhanh
+- ⚡ [QUICK-REFERENCE.vi.md](QUICK-REFERENCE.vi.md) - Tham khảo lệnh nhanh
+- 🚀 [DEPLOY.md](DEPLOY.md) - Hướng dẫn deploy (cho developers)
+
+---
+
+**Made with ❤️ by caochitam**
+
+*Powered by OpenClaw + zca-js*

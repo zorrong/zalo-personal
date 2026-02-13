@@ -239,11 +239,11 @@ openclaw security audit --fix
 
 ## Tài liệu khác
 
-📖 **[README.vi.md](./README.vi.md)** - Tài liệu đầy đủ (Tiếng Việt)
+📖 **[README.md](./README.md)** - Tài liệu đầy đủ (Tiếng Việt)
 
-📖 **[README.md](./README.md)** - Full documentation (English)
+🇬🇧 **[README.en.md](./README.en.md)** - English documentation
 
-📖 **[INSTALL.md](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
+📖 **[INSTALL.md](./INSTALL.md)** - Hướng dẫn cài đặt nhanh
 
 ## Support & Community
 
@@ -256,4 +256,4 @@ openclaw security audit --fix
 
 ---
 
-**Version**: 1.1.2 | **Updated**: 2026-02-14
+**Version**: 1.1.4 | **Updated**: 2026-02-14
