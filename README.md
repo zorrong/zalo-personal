@@ -197,6 +197,6 @@ Part of the OpenClaw project
 
 ---
 
-**Version**: 1.0.8
+**Version**: 1.0.9
 **OpenClaw**: 2026.2.9+
 **Last Updated**: 2026-02-13
