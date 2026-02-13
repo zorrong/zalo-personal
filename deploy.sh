@@ -70,7 +70,7 @@ echo ""
 
 # Git commit
 echo "📝 Creating git commit..."
-git add package.json package-lock.json README.md QUICK-REFERENCE.vi.md
+git add package.json README.md QUICK-REFERENCE.vi.md
 
 read -p "Enter commit message (or press Enter for default): " commit_msg
 
