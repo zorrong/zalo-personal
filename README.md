@@ -22,15 +22,16 @@ bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main
 
 ### Already Installed?
 
-Re-run the quick install script to reconfigure or reinstall:
+Re-run the quick install script to reconfigure, update, or reinstall:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
 ```
 
 It will detect existing installation and ask if you want to:
-- Use existing extension (just reconfigure)
-- Clean install (remove and reinstall)
+- **Use existing extension** (just reconfigure)
+- **Update to latest version** (safe in-place update)
+- **Clean install** (remove and reinstall)
 
 ### Manual Login
 
@@ -42,6 +43,28 @@ openclaw channels login --channel zalo-personal
 
 # Or use alias
 openclaw channels login --channel zp
+```
+
+### Updating
+
+Update to the latest version with one command:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/update.sh)
+```
+
+The update script will:
+- ✅ Check current version vs latest
+- ✅ Create automatic backup
+- ✅ Download and install latest from npm
+- ✅ Preserve your configuration
+- ✅ Prompt to restart gateway
+
+**Or** use the quick install script (option 2):
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
+# Then choose [2] Update to latest version
 ```
 
 ## Features

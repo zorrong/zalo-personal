@@ -87,11 +87,12 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
     echo ""
     echo "Bạn muốn:"
     echo "  [1] Sử dụng extension hiện có (chỉ config lại)"
-    echo "  [2] Clean install (xóa hết, cài lại từ đầu)"
+    echo "  [2] Update to latest version (cập nhật)"
+    echo "  [3] Clean install (xóa hết, cài lại từ đầu)"
     echo ""
 
     while true; do
-        read -p "Chọn [1/2]: " choice
+        read -p "Chọn [1/2/3]: " choice
         case $choice in
             1)
                 echo ""
@@ -100,6 +101,20 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
                 break
                 ;;
             2)
+                echo ""
+                echo "🔄 Update to latest version"
+                echo ""
+
+                # Run update script
+                bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/update.sh)
+
+                # If update script exited successfully, we're done
+                echo ""
+                echo "✅ Update hoàn tất! Script dừng ở đây."
+                echo "   (Nếu cần config lại, chạy lại script này và chọn [1])"
+                exit 0
+                ;;
+            3)
                 echo ""
                 echo "🧹 Clean install - Xóa và cài lại từ đầu"
                 echo ""
@@ -163,7 +178,7 @@ if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
                 break
                 ;;
             *)
-                echo "❌ Chọn 1 hoặc 2!"
+                echo "❌ Chọn 1, 2, hoặc 3!"
                 ;;
         esac
     done

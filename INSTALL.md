@@ -51,6 +51,41 @@ bash <(wget -qO- https://raw.githubusercontent.com/caochitam/zalo-personal/main/
 
 ---
 
+## 🔄 Cập nhật Plugin
+
+### Cách 1: Script cập nhật (Nhanh nhất)
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/update.sh)
+```
+
+Script sẽ:
+- ✅ Kiểm tra version hiện tại vs mới nhất
+- ✅ Tự động backup trước khi update
+- ✅ Tải và cài đặt version mới từ npm
+- ✅ Giữ nguyên cấu hình của bạn
+- ✅ Hỏi restart gateway
+
+### Cách 2: Dùng quick-install script
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
+```
+
+Khi được hỏi, chọn **[2] Update to latest version**
+
+### Cách 3: Thủ công (nếu 2 cách trên không work)
+
+```bash
+cd ~/.openclaw/extensions/zalo-personal
+npm pack zalo-personal@latest
+tar -xzf zalo-personal-*.tgz --strip-components=1
+rm zalo-personal-*.tgz
+openclaw gateway restart
+```
+
+---
+
 ## Chặn người dùng (Blocklist)
 
 ### Chặn user toàn cục
