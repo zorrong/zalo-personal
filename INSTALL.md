@@ -154,6 +154,7 @@ rm -rf ~/.openclaw/extensions/zalo-personal
 - GitHub: https://github.com/caochitam/zalo-personal
 - npm: https://www.npmjs.com/package/zalo-personal
 - Issues: https://github.com/caochitam/zalo-personal/issues
+- Nhóm Zalo Support: https://zalo.me/g/zgictz077
 
 ---
 

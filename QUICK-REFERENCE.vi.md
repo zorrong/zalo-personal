@@ -200,6 +200,15 @@ openclaw security audit --fix
 
 📖 **[INSTALL.md](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
 
+## Support & Community
+
+👥 **Nhóm Zalo:** https://zalo.me/g/zgictz077
+- Hỏi đáp, thảo luận
+- Báo lỗi, request tính năng
+- Cập nhật phiên bản mới
+
+🐛 **GitHub Issues:** https://github.com/caochitam/zalo-personal/issues
+
 ---
 
 **Version**: 1.0.8 | **Updated**: 2026-02-13

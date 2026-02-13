@@ -33,7 +33,8 @@
     "quick-install.sh",
     "config-helper.cjs",
     "openclaw.plugin.json",
-    "index.ts"
+    "index.ts",
+    "zalo-group.jpg"
   ],
   "scripts": {
     "prepublishOnly": "echo 'Ready to publish!'"

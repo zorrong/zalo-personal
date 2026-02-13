@@ -51,7 +51,7 @@ openclaw channels login --channel zp
 - ✅ **Gateway Restart** - Optional restart prompt for certificate recognition
 - ✅ **Pairing Mode** - Control who can message your bot
 - ✅ **Group Support** - Works with both DMs and group chats
-- ✅ **Multi-Account** - Support multiple Zalo accounts
+- ✅ **Stable & Reliable** - Built on battle-tested zca-js library
 
 ## Login Process
 
@@ -160,6 +160,22 @@ Use **pairing mode** instead of allowlist, or use numeric User IDs directly.
 - 📚 [OpenClaw Docs](https://docs.openclaw.ai/)
 - 🐛 [GitHub Issues](https://github.com/openclaw/openclaw/issues)
 - 💬 [Discord Community](https://discord.gg/openclaw)
+
+## 👥 Join Zalo Community
+
+Tham gia nhóm Zalo để:
+- 💬 Thảo luận và hỗ trợ lẫn nhau
+- 🐛 Báo lỗi và request tính năng mới
+- 📣 Cập nhật phiên bản mới nhất
+- 🤝 Kết nối với cộng đồng OpenClaw VN
+
+<p align="center">
+  <a href="https://zalo.me/g/zgictz077">
+    <img src="./zalo-group.jpg" alt="Join Zalo Group" width="300"/>
+  </a>
+</p>
+
+**Link:** https://zalo.me/g/zgictz077
 
 ## What's New
 
