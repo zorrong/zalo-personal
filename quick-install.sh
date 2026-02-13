@@ -175,10 +175,36 @@ if [ "$ALREADY_INSTALLED" = false ] || [ "$choice" = "2" ]; then
     echo "⚠️  Có thể xuất hiện warning về 'dangerous code patterns' - điều này bình thường"
     echo "    (Extension cần quyền restart gateway)"
     echo ""
+    echo "─────────────────────────────────────────────────────────────"
+    echo "📥 Installing plugin and dependencies..."
+    echo ""
+    echo "📦 Dependencies sẽ được cài:"
+    echo "   • zca-js (Zalo library)"
+    echo "   • qrcode-terminal (QR display)"
+    echo "   • pngjs, jsqr (Image processing)"
+    echo "   • zod, @sinclair/typebox (Validation)"
+    echo ""
 
-    openclaw plugins install zalo-personal
+    # Set npm to show more output
+    export NPM_CONFIG_LOGLEVEL=info
 
-    if [ $? -ne 0 ]; then
+    # Run install command and show output
+    openclaw plugins install zalo-personal 2>&1
+
+    INSTALL_EXIT_CODE=$?
+    echo ""
+    echo "─────────────────────────────────────────────────────────────"
+
+    # Show installed packages
+    if [ $INSTALL_EXIT_CODE -eq 0 ] && [ -d "$HOME/.openclaw/extensions/zalo-personal/node_modules" ]; then
+        echo ""
+        echo "✅ Đã cài đặt các dependencies:"
+        ls -1 "$HOME/.openclaw/extensions/zalo-personal/node_modules" | grep -E "^(zca-js|qrcode|pngjs|jsqr|zod|typebox)" | sed 's/^/   ✓ /'
+        echo ""
+    fi
+    echo ""
+
+    if [ $INSTALL_EXIT_CODE -ne 0 ]; then
         echo "❌ Cài đặt thất bại!"
         echo ""
         echo "🔍 Có thể thử:"
@@ -188,7 +214,6 @@ if [ "$ALREADY_INSTALLED" = false ] || [ "$choice" = "2" ]; then
         exit 1
     fi
 
-    echo ""
     echo "✅ Cài đặt extension thành công!"
     echo ""
 fi

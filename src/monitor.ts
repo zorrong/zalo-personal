@@ -107,7 +107,11 @@ function convertToZaloPersonalMessage(msg: Message): ZaloPersonalMessage | null 
 
   const isGroup = msg.type === ThreadType.Group;
   const threadId = msg.threadId;
-  const senderId = data.uidFrom;
+  // For DMs, if uidFrom is not numeric (obfuscated ID), use threadId instead
+  const rawSenderId = data.uidFrom;
+  const senderId = !isGroup && !/^\d+$/.test(rawSenderId)
+    ? threadId  // DM: use threadId as user ID when uidFrom is not numeric
+    : rawSenderId;
   const senderName = data.dName ?? "";
   const timestamp = data.ts ? parseInt(data.ts, 10) : Math.floor(Date.now() / 1000);
 

@@ -115,6 +115,21 @@ openclaw gateway restart
 openclaw logs --follow
 ```
 
+## Uninstall
+
+To completely remove the extension:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/uninstall.sh)
+```
+
+This will:
+- Logout from channel
+- Disable plugin
+- Remove all files
+- Clean up configuration
+- Optionally restart gateway
+
 ## Documentation
 
 📖 **[Quick Reference (Vietnamese)](./QUICK-REFERENCE.vi.md)** - Tài liệu tra cứu nhanh

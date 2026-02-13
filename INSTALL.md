@@ -139,12 +139,35 @@ openclaw gateway restart
 
 ## Uninstall
 
+### Quick Uninstall (Recommended)
+
+Copy-paste câu lệnh này để gỡ cài đặt tự động:
+
 ```bash
-# Disable plugin
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/uninstall.sh)
+```
+
+Script sẽ tự động:
+- ✅ Logout khỏi channel
+- ✅ Disable plugin
+- ✅ Xóa thư mục extension
+- ✅ Dọn dẹp config trong openclaw.json
+- ✅ Hỏi restart gateway
+
+### Manual Uninstall
+
+```bash
+# 1. Logout
+openclaw channels logout --channel zalo-personal
+
+# 2. Disable plugin
 openclaw plugins disable zalo-personal
 
-# Remove files
+# 3. Remove files
 rm -rf ~/.openclaw/extensions/zalo-personal
+
+# 4. Restart gateway
+openclaw gateway restart
 ```
 
 ---

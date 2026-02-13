@@ -26,6 +26,7 @@
   "homepage": "https://github.com/caochitam/zalo-personal#readme",
   "files": [
     "src/",
+    "script/",
     "README.md",
     "INSTALL.md",
     "QUICK-REFERENCE.vi.md",
