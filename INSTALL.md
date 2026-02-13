@@ -51,6 +51,65 @@ bash <(wget -qO- https://raw.githubusercontent.com/caochitam/zalo-personal/main/
 
 ---
 
+## Chặn người dùng (Blocklist)
+
+### Chặn user toàn cục
+
+Chặn người dùng khỏi bot trong mọi ngữ cảnh (DM và nhóm):
+
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]
+    denyFrom:
+      - "Tên user cần chặn"
+      - "123456789"    # Hoặc dùng User ID
+```
+
+### Chặn user trong nhóm cụ thể
+
+Cho phép nhóm nhưng chặn một số thành viên:
+
+```yaml
+channels:
+  zalo-personal:
+    groupPolicy: allowlist
+    groups:
+      "Nhóm công việc":
+        allow: true
+        denyUsers:
+          - "User không mong muốn"
+          - "987654321"
+```
+
+### Quy tắc ưu tiên
+
+- **Chặn (deny) luôn thắng cho phép (allow)**
+- User trong cả `allowFrom` và `denyFrom` → BỊ CHẶN
+- Dùng tên thân thiện, bot tự resolve sang ID
+- Tên không tìm thấy → cảnh báo trong log, bỏ qua
+
+### Ví dụ: Kết hợp allow và deny
+
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]       # Cho phép mọi người
+    denyFrom:
+      - "Spammer"          # Trừ những người này
+      - "Troll"
+    groupPolicy: allowlist
+    groups:
+      "Nhóm công khai":
+        allow: true
+        denyUsers:
+          - "BadUser"      # Chặn trong nhóm này
+```
+
+---
+
 ## Sau khi cài đặt
 
 ### Kiểm tra status:

@@ -2,10 +2,12 @@ import { MarkdownConfigSchema, ToolPolicySchema } from "openclaw/plugin-sdk";
 import { z } from "zod";
 
 const allowFromEntry = z.union([z.string(), z.number()]);
+const denyFromEntry = z.union([z.string(), z.number()]);
 
 const groupConfigSchema = z.object({
   allow: z.boolean().optional(),
   enabled: z.boolean().optional(),
+  denyUsers: z.array(denyFromEntry).optional(),
   tools: ToolPolicySchema,
 });
 
@@ -15,6 +17,7 @@ const zaloPersonalAccountSchema = z.object({
   markdown: MarkdownConfigSchema,
   dmPolicy: z.enum(["pairing", "allowlist", "open", "disabled"]).optional(),
   allowFrom: z.array(allowFromEntry).optional(),
+  denyFrom: z.array(denyFromEntry).optional(),
   groupPolicy: z.enum(["disabled", "allowlist", "open"]).optional(),
   groups: z.object({}).catchall(groupConfigSchema).optional(),
   messagePrefix: z.string().optional(),

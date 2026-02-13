@@ -3,10 +3,16 @@ export type ZaloPersonalAccountConfig = {
   name?: string;
   dmPolicy?: "pairing" | "allowlist" | "open" | "disabled";
   allowFrom?: Array<string | number>;
+  denyFrom?: Array<string | number>;
   groupPolicy?: "open" | "allowlist" | "disabled";
   groups?: Record<
     string,
-    { allow?: boolean; enabled?: boolean; tools?: { allow?: string[]; deny?: string[] } }
+    {
+      allow?: boolean;
+      enabled?: boolean;
+      denyUsers?: Array<string | number>;
+      tools?: { allow?: string[]; deny?: string[] };
+    }
   >;
   messagePrefix?: string;
   responsePrefix?: string;
@@ -18,10 +24,16 @@ export type ZaloPersonalConfig = {
   defaultAccount?: string;
   dmPolicy?: "pairing" | "allowlist" | "open" | "disabled";
   allowFrom?: Array<string | number>;
+  denyFrom?: Array<string | number>;
   groupPolicy?: "open" | "allowlist" | "disabled";
   groups?: Record<
     string,
-    { allow?: boolean; enabled?: boolean; tools?: { allow?: string[]; deny?: string[] } }
+    {
+      allow?: boolean;
+      enabled?: boolean;
+      denyUsers?: Array<string | number>;
+      tools?: { allow?: string[]; deny?: string[] };
+    }
   >;
   messagePrefix?: string;
   responsePrefix?: string;

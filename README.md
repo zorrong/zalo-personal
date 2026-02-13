@@ -95,6 +95,88 @@ channels:
     allowFrom: ["*"]
 ```
 
+## Blocklist (Denylist) Features
+
+### Block Individual Users Globally
+
+Prevent specific users from messaging your bot in any context (DMs and groups):
+
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]
+    denyFrom:
+      - "Spam User"        # Block by name (auto-resolved to ID)
+      - "123456789"        # Block by numeric ID
+```
+
+### Block Users in Specific Groups
+
+Allow a group but block specific members within that group:
+
+```yaml
+channels:
+  zalo-personal:
+    groupPolicy: allowlist
+    groups:
+      "Work Chat":
+        allow: true
+        denyUsers:
+          - "Bob"           # Bob can't trigger bot in this group
+          - "987654321"     # Block by ID
+      "Friends Group":
+        allow: true
+        # No denyUsers - everyone can use bot here
+```
+
+### Block Entire Groups
+
+Simply don't add the group to your `groups` config, or set `allow: false`:
+
+```yaml
+channels:
+  zalo-personal:
+    groupPolicy: allowlist
+    groups:
+      "Spam Group":
+        allow: false       # Block entire group
+```
+
+### Precedence Rules
+
+**Deny ALWAYS wins over allow:**
+- User in both `allowFrom` and `denyFrom` → BLOCKED
+- User allowed globally but in `denyUsers` for a group → BLOCKED in that group
+- Wildcard `*` in `allowFrom` but specific users in `denyFrom` → Those users BLOCKED
+
+### Configuration Example: Mixed Allow/Deny
+
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]       # Allow everyone by default
+    denyFrom:
+      - "Spammer"          # Except this user
+      - "Troll Account"
+    groupPolicy: allowlist
+    groups:
+      "Public Group":
+        allow: true
+        denyUsers:
+          - "BadActor"     # Block specific user in this group
+      "Private Group":
+        allow: true        # No blocks, everyone in group can use bot
+```
+
+### Name Resolution
+
+- Bot automatically resolves names to IDs at startup
+- Use friendly names instead of managing numeric IDs
+- Unresolved names are logged as warnings (bot continues to work)
+- Numeric IDs work directly without resolution
+
 ## Quick Commands
 
 ```bash
@@ -169,6 +251,12 @@ openclaw gateway restart
 
 ### Can't resolve username to User ID
 Use **pairing mode** instead of allowlist, or use numeric User IDs directly.
+
+### User still getting through despite denyFrom
+1. Check logs: `openclaw logs --follow`
+2. Verify name resolution in startup logs
+3. Use numeric ID if name doesn't resolve
+4. Restart gateway: `openclaw gateway restart`
 
 ## Support
 

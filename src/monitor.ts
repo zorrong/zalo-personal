@@ -57,6 +57,69 @@ function isSenderAllowed(senderId: string, allowFrom: string[]): boolean {
   });
 }
 
+/**
+ * Check if a sender is globally denied (blocked)
+ * @param senderId - User ID to check
+ * @param denyFrom - Array of denied user IDs/names (already resolved to IDs)
+ * @returns true if sender is blocked, false otherwise
+ */
+function isSenderDenied(senderId: string, denyFrom: string[]): boolean {
+  if (denyFrom.length === 0) {
+    return false;
+  }
+  const normalizedSenderId = senderId.toLowerCase();
+  return denyFrom.some((entry) => {
+    const normalized = entry.toLowerCase().replace(/^(zalo-personal|zp):/i, "");
+    return normalized === normalizedSenderId;
+  });
+}
+
+/**
+ * Check if a specific user is denied within a specific group
+ * @param senderId - User ID to check
+ * @param groupId - Group ID
+ * @param groupName - Group name (optional)
+ * @param groups - Group configuration object
+ * @returns true if user is blocked in this group, false otherwise
+ */
+function isUserDeniedInGroup(params: {
+  senderId: string;
+  groupId: string;
+  groupName?: string | null;
+  groups: Record<string, { denyUsers?: Array<string | number> }>;
+}): boolean {
+  const groups = params.groups ?? {};
+  const candidates = [
+    params.groupId,
+    `group:${params.groupId}`,
+    params.groupName ?? "",
+    normalizeGroupSlug(params.groupName ?? ""),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const groupConfig = groups[candidate];
+    if (!groupConfig || !groupConfig.denyUsers) {
+      continue;
+    }
+
+    const denyUsers = groupConfig.denyUsers.map((v) => String(v));
+    if (isSenderDenied(params.senderId, denyUsers)) {
+      return true;
+    }
+  }
+
+  // Check wildcard group config
+  const wildcard = groups["*"];
+  if (wildcard?.denyUsers) {
+    const denyUsers = wildcard.denyUsers.map((v) => String(v));
+    if (isSenderDenied(params.senderId, denyUsers)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function normalizeGroupSlug(raw?: string | null): string {
   const trimmed = raw?.trim().toLowerCase() ?? "";
   if (!trimmed) {
@@ -150,10 +213,32 @@ async function processMessage(
   const groupName = metadata?.threadName ?? "";
   const chatId = threadId;
 
+  // NEW: Global denylist check (runs FIRST, before everything)
+  const configDenyFrom = (account.config.denyFrom ?? []).map((v) => String(v));
+  if (configDenyFrom.length > 0 && isSenderDenied(senderId, configDenyFrom)) {
+    logVerbose(
+      core,
+      runtime,
+      `Blocked denied sender ${senderId} (${senderName || "unknown"}) via denyFrom`,
+    );
+    return;
+  }
+
   const defaultGroupPolicy = config.channels?.defaults?.groupPolicy;
   const groupPolicy = account.config.groupPolicy ?? defaultGroupPolicy ?? "open";
   const groups = account.config.groups ?? {};
   if (isGroup) {
+    // NEW: Check if user is denied within this specific group
+    if (isUserDeniedInGroup({ senderId, groupId: chatId, groupName, groups })) {
+      logVerbose(
+        core,
+        runtime,
+        `Blocked sender ${senderId} (${senderName || "unknown"}) denied in group ${chatId} via denyUsers`,
+      );
+      return;
+    }
+
+    // EXISTING: Group policy checks continue unchanged
     if (groupPolicy === "disabled") {
       logVerbose(core, runtime, `'zalo-personal': drop group ${chatId} (groupPolicy=disabled)`);
       return;
@@ -469,6 +554,57 @@ export async function monitorZaloPersonalProvider(
       }
     }
 
+    // NEW: Resolve denyFrom name→id mappings
+    const denyFromEntries = (account.config.denyFrom ?? [])
+      .map((entry) => normalizeZaloPersonalEntry(String(entry)))
+      .filter((entry) => entry && entry !== "*");
+
+    if (denyFromEntries.length > 0) {
+      try {
+        const api = await getApi();
+        const friends = await api.getAllFriends();
+        const friendList: ZaloPersonalFriend[] = Array.isArray(friends)
+          ? friends.map((f: any) => ({
+              userId: String(f.userId),
+              displayName: f.displayName ?? f.zaloName ?? "",
+              avatar: f.avatar,
+            }))
+          : [];
+        const byName = buildNameIndex(friendList, (friend) => friend.displayName);
+        const additions: string[] = [];
+        const mapping: string[] = [];
+        const unresolved: string[] = [];
+
+        for (const entry of denyFromEntries) {
+          if (/^\d+$/.test(entry)) {
+            additions.push(entry);
+            continue;
+          }
+          const matches = byName.get(entry.toLowerCase()) ?? [];
+          const match = matches[0];
+          const id = match?.userId ? String(match.userId) : undefined;
+          if (id) {
+            additions.push(id);
+            mapping.push(`${entry}→${id}`);
+          } else {
+            unresolved.push(entry);
+          }
+        }
+
+        const denyFrom = mergeAllowlist({ existing: account.config.denyFrom, additions });
+        account = {
+          ...account,
+          config: {
+            ...account.config,
+            denyFrom,
+          },
+        };
+        summarizeMapping("zalo-personal blocked users", mapping, unresolved, runtime);
+      } catch (err) {
+        runtime.log?.(`zalo-personal denyFrom resolve failed. ${String(err)}`);
+      }
+    }
+
     // Resolve group name→id mappings
     const groupsConfig = account.config.groups ?? {};
     const groupKeys = Object.keys(groupsConfig).filter((key) => key !== "*");
@@ -516,6 +652,72 @@ export async function monitorZaloPersonalProvider(
             unresolved.push(entry);
           }
         }
+
+        // NEW: Resolve denyUsers within each group
+        for (const groupKey of Object.keys(nextGroups)) {
+          const groupConfig = nextGroups[groupKey];
+          if (!groupConfig.denyUsers || groupConfig.denyUsers.length === 0) {
+            continue;
+          }
+
+          const denyUserEntries = groupConfig.denyUsers
+            .map((entry) => normalizeZaloPersonalEntry(String(entry)))
+            .filter((entry) => entry && entry !== "*");
+
+          if (denyUserEntries.length === 0) {
+            continue;
+          }
+
+          // Fetch friends for name resolution (reuse API call)
+          const friends = await api.getAllFriends();
+          const friendList: ZaloPersonalFriend[] = Array.isArray(friends)
+            ? friends.map((f: any) => ({
+                userId: String(f.userId),
+                displayName: f.displayName ?? f.zaloName ?? "",
+                avatar: f.avatar,
+              }))
+            : [];
+          const friendByName = buildNameIndex(friendList, (friend) => friend.displayName);
+
+          const userAdditions: string[] = [];
+          const userMapping: string[] = [];
+          const userUnresolved: string[] = [];
+
+          for (const entry of denyUserEntries) {
+            if (/^\d+$/.test(entry)) {
+              userAdditions.push(entry);
+              continue;
+            }
+            const matches = friendByName.get(entry.toLowerCase()) ?? [];
+            const match = matches[0];
+            const id = match?.userId ? String(match.userId) : undefined;
+            if (id) {
+              userAdditions.push(id);
+              userMapping.push(`${entry}→${id}`);
+            } else {
+              userUnresolved.push(entry);
+            }
+          }
+
+          const resolvedDenyUsers = mergeAllowlist({
+            existing: groupConfig.denyUsers,
+            additions: userAdditions,
+          });
+          nextGroups[groupKey] = {
+            ...groupConfig,
+            denyUsers: resolvedDenyUsers,
+          };
+
+          if (userMapping.length > 0 || userUnresolved.length > 0) {
+            summarizeMapping(
+              `zalo-personal group:${groupKey} blocked users`,
+              userMapping,
+              userUnresolved,
+              runtime,
+            );
+          }
+        }
+
         account = {
           ...account,
           config: {
