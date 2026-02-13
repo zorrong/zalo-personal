@@ -44,3 +44,7 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
+
+# Development scripts and docs (internal use only)
+deploy.sh
+DEPLOY.md

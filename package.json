@@ -26,11 +26,13 @@
   "homepage": "https://github.com/caochitam/zalo-personal#readme",
   "files": [
     "src/",
-    "*.md",
-    "*.sh",
-    "*.js",
-    "*.cjs",
-    "*.json",
+    "README.md",
+    "INSTALL.md",
+    "QUICK-REFERENCE.vi.md",
+    "LICENSE",
+    "quick-install.sh",
+    "config-helper.cjs",
+    "openclaw.plugin.json",
     "index.ts"
   ],
   "scripts": {
