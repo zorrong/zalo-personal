@@ -61,10 +61,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main
 
 Script sẽ:
 - ✅ Kiểm tra version hiện tại vs mới nhất
-- ✅ Tự động backup trước khi update
+- ✅ Tự động backup vào `/tmp` (tự xóa sau reboot)
 - ✅ Tải và cài đặt version mới từ npm
 - ✅ Giữ nguyên cấu hình của bạn
 - ✅ Hỏi restart gateway
+
+**Lưu ý:** Backup lưu trong `/tmp/zalo-personal-backup-*` và tự động xóa sau khi reboot hệ thống.
 
 ### Cách 2: Dùng quick-install script
 
@@ -142,6 +144,33 @@ channels:
         denyUsers:
           - "BadUser"      # Chặn trong nhóm này
 ```
+
+### Quản lý blocklist qua AI
+
+Bot có thể tự quản lý blocklist khi bạn yêu cầu:
+
+**Ví dụ:**
+```
+Bạn: "Chặn user Bob đi"
+AI: ✅ User Bob (ID: 123456) đã bị chặn toàn cục
+    ⚠️ Restart gateway: openclaw gateway restart
+
+Bạn: "Bỏ chặn Alice"
+AI: ✅ User Alice (ID: 789012) đã được bỏ chặn
+
+Bạn: "Cho xem danh sách blocked"
+AI: 📋 Blocked users (2): 123456, 999888
+```
+
+**Lệnh AI hỗ trợ:**
+- `block-user` - Chặn user toàn cục
+- `unblock-user` - Bỏ chặn user
+- `block-user-in-group` - Chặn trong nhóm cụ thể
+- `unblock-user-in-group` - Bỏ chặn trong nhóm
+- `list-blocked` - Xem danh sách blocked
+- `list-allowed` - Xem danh sách allowed
+
+**Lưu ý:** Luôn restart gateway sau khi thay đổi blocklist!
 
 ---
 

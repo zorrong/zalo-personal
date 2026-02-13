@@ -5,6 +5,12 @@
 ```bash
 # Cài mới hoặc cài lại (tự động detect và hỏi bạn)
 bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
+
+# Cập nhật lên version mới nhất
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/update.sh)
+
+# Gỡ cài đặt
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/script/uninstall.sh)
 ```
 
 ## Lệnh cơ bản
@@ -102,6 +108,43 @@ channels:
     groupPolicy: open
 ```
 
+## Blocklist (Chặn user)
+
+### Chặn toàn cục
+```yaml
+channels:
+  zalo-personal:
+    dmPolicy: open
+    allowFrom: ["*"]
+    denyFrom:
+      - "Tên Spam User"    # Tự động resolve sang ID
+      - "123456789"        # Hoặc dùng ID trực tiếp
+```
+
+### Chặn trong nhóm
+```yaml
+channels:
+  zalo-personal:
+    groupPolicy: allowlist
+    groups:
+      "Nhóm Work":
+        allow: true
+        denyUsers:
+          - "Bob"           # Chặn Bob trong nhóm này
+```
+
+### Quy tắc
+- **Deny luôn thắng Allow** (security-first)
+- Tên tự động resolve sang ID
+- Restart gateway sau khi thay đổi
+
+### AI Tool
+```
+"Chặn user Bob" → Bot tự block
+"Bỏ chặn Alice" → Bot tự unblock
+"Xem danh sách blocked" → Bot show list
+```
+
 ## Xử lý sự cố nhanh
 
 ### QR không hiển thị
@@ -196,7 +239,9 @@ openclaw security audit --fix
 
 ## Tài liệu khác
 
-📖 **[README.md](./README.md)** - Quick start (English)
+📖 **[README.vi.md](./README.vi.md)** - Tài liệu đầy đủ (Tiếng Việt)
+
+📖 **[README.md](./README.md)** - Full documentation (English)
 
 📖 **[INSTALL.md](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
 
@@ -211,4 +256,4 @@ openclaw security audit --fix
 
 ---
 
-**Version**: 1.0.9 | **Updated**: 2026-02-13
+**Version**: 1.1.2 | **Updated**: 2026-02-14
