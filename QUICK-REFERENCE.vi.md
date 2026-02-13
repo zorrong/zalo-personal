@@ -3,11 +3,8 @@
 ## Setup nhanh (Khuyến nghị)
 
 ```bash
-# Pairing Mode (An toàn)
-bash ~/.openclaw/extensions/zalo-personal/zalo-pairing-setup.sh
-
-# Open Mode (Ai cũng nhắn được)
-bash ~/.openclaw/extensions/zalo-personal/zalo-open-setup.sh
+# Cài mới hoặc cài lại (tự động detect và hỏi bạn)
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
 ```
 
 ## Lệnh cơ bản
@@ -197,12 +194,12 @@ openclaw security audit --fix
 - [ ] ✅ Dùng model mạnh nhất
 - [ ] ✅ Sandbox tools nếu enable
 
-## Tài liệu đầy đủ
-
-📖 **[ONBOARDING-GUIDE.md](./ONBOARDING-GUIDE.md)** - Hướng dẫn chi tiết
+## Tài liệu khác
 
 📖 **[README.md](./README.md)** - Quick start (English)
 
+📖 **[INSTALL.md](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
+
 ---
 
-**Version**: 1.0.0 | **Updated**: 2026-02-12
+**Version**: 1.0.7 | **Updated**: 2026-02-13

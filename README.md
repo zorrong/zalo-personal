@@ -20,17 +20,21 @@ bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main
 
 ## Quick Start
 
-### Easy Setup (Recommended - If Already Installed)
+### Already Installed?
+
+Re-run the quick install script to reconfigure or reinstall:
 
 ```bash
-# Option 1: Pairing Mode (Secure - requires approval)
-bash ~/.openclaw/extensions/zalo-personal/zalo-pairing-setup.sh
-
-# Option 2: Open Mode (Anyone can message)
-bash ~/.openclaw/extensions/zalo-personal/zalo-open-setup.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
 ```
 
-### Manual Setup
+It will detect existing installation and ask if you want to:
+- Use existing extension (just reconfigure)
+- Clean install (remove and reinstall)
+
+### Manual Login
+
+If already configured, just login:
 
 ```bash
 # Login to Zalo Personal
@@ -38,9 +42,6 @@ openclaw channels login --channel zalo-personal
 
 # Or use alias
 openclaw channels login --channel zp
-
-# Run onboarding wizard (not recommended - forces User ID input)
-openclaw onboard
 ```
 
 ## Features
@@ -116,7 +117,8 @@ openclaw logs --follow
 
 ## Documentation
 
-📖 **[Full Onboarding Guide](./ONBOARDING-GUIDE.md)** - Hướng dẫn chi tiết bằng tiếng Việt
+📖 **[Quick Reference (Vietnamese)](./QUICK-REFERENCE.vi.md)** - Tài liệu tra cứu nhanh
+📖 **[Installation Guide (Vietnamese)](./INSTALL.md)** - Hướng dẫn cài đặt chi tiết
 
 ## Requirements
 
@@ -161,12 +163,17 @@ Use **pairing mode** instead of allowlist, or use numeric User IDs directly.
 
 ## What's New
 
+### v1.0.7 (2026-02-13)
+- ✅ Smart detection and cleanup of failed installations
+- ✅ Unified `quick-install.sh` script handles all scenarios
+- ✅ Auto-cleanup stale config from previous failed installs
+- ✅ Interactive mode selection (Open/Pairing)
+
 ### v1.0.0 (2026-02-12)
 - ✅ Auto-delete QR image after successful login
 - ✅ Display QR file path during login
 - ✅ Optional gateway restart prompt
 - ✅ Cleanup on login failure
-- ✅ Support both onboarding wizard and direct login
 
 ## License
 
@@ -174,6 +181,6 @@ Part of the OpenClaw project
 
 ---
 
-**Version**: 1.0.0
-**OpenClaw**: 2026.2.9
-**Last Updated**: 2026-02-12
+**Version**: 1.0.7
+**OpenClaw**: 2026.2.9+
+**Last Updated**: 2026-02-13

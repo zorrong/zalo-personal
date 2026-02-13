@@ -75,22 +75,41 @@ openclaw send -c zalo-personal -to USER_ID "Xin chào!"
 
 ---
 
+## Reinstall hoặc Reconfigure
+
+Nếu đã cài rồi muốn cài lại:
+
+```bash
+# Chạy lại script - sẽ tự detect và hỏi bạn
+bash <(curl -fsSL https://raw.githubusercontent.com/caochitam/zalo-personal/main/quick-install.sh)
+
+# Chọn option 2 để clean install
+```
+
 ## Manual Installation
 
-Nếu không muốn dùng one-liner:
+Nếu không muốn dùng script:
 
 ```bash
 # 1. Cài extension
-openclaw ext add zalo-personal
+openclaw plugins install zalo-personal
 
-# 2. Chạy setup script
-cd ~/.openclaw/extensions/zalo-personal
+# 2. Configure channel
+# Edit ~/.openclaw/openclaw.json, thêm:
+{
+  "channels": {
+    "zalo-personal": {
+      "dmPolicy": "pairing",  # hoặc "open"
+      "allowFrom": ["*"]      # chỉ cần nếu dùng open mode
+    }
+  }
+}
 
-# Open mode
-bash zalo-open-setup.sh
+# 3. Login
+openclaw channels login --channel zalo-personal
 
-# Hoặc Pairing mode
-bash zalo-pairing-setup.sh
+# 4. Restart gateway
+openclaw gateway restart
 ```
 
 ---

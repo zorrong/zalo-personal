@@ -22,6 +22,63 @@ fi
 echo "✅ OpenClaw detected"
 echo ""
 
+# Clean stale config from previous failed install
+# If config references zalo-personal but extension dir is missing/broken, clean it up
+EXT_DIR_CHECK="$HOME/.openclaw/extensions/zalo-personal"
+if [ -f "$CONFIG_FILE" ] && [ ! -d "$EXT_DIR_CHECK/node_modules" ]; then
+    # Check if config has a stale zalo-personal entry
+    HAS_STALE=$(node -e "
+    const fs = require('fs');
+    try {
+      const c = JSON.parse(fs.readFileSync('$CONFIG_FILE', 'utf8'));
+      const hasPlugin = c.plugins && c.plugins.entries && c.plugins.entries['zalo-personal'];
+      const hasInstall = c.plugins && c.plugins.installs && c.plugins.installs['zalo-personal'];
+      console.log(hasPlugin || hasInstall ? 'yes' : 'no');
+    } catch { console.log('no'); }
+    " 2>/dev/null)
+
+    if [ "$HAS_STALE" = "yes" ]; then
+        echo "🧹 Phát hiện config từ lần cài trước bị lỗi, đang dọn dẹp..."
+
+        node -e "
+        const fs = require('fs');
+        const path = '$CONFIG_FILE';
+        try {
+          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+          let cleaned = false;
+          if (config.plugins && config.plugins.entries && config.plugins.entries['zalo-personal']) {
+            delete config.plugins.entries['zalo-personal'];
+            cleaned = true;
+          }
+          if (config.plugins && config.plugins.installs && config.plugins.installs['zalo-personal']) {
+            delete config.plugins.installs['zalo-personal'];
+            cleaned = true;
+          }
+          if (config.channels && config.channels['zalo-personal']) {
+            delete config.channels['zalo-personal'];
+            cleaned = true;
+          }
+
+          if (cleaned) {
+            fs.writeFileSync(path, JSON.stringify(config, null, 2));
+            console.log('   ✅ Đã dọn config cũ thành công');
+          }
+        } catch (e) {
+          console.error('   ⚠️  Warning:', e.message);
+        }
+        " 2>/dev/null || echo "   ⚠️  Không thể dọn config cũ"
+
+        # Also remove broken extension directory if it exists
+        if [ -d "$EXT_DIR_CHECK" ]; then
+            rm -rf "$EXT_DIR_CHECK"
+            echo "   🗑️  Đã xóa thư mục extension cũ bị lỗi"
+        fi
+
+        echo ""
+    fi
+fi
+
 # Check if already installed
 ALREADY_INSTALLED=false
 if [ -d "$HOME/.openclaw/extensions/zalo-personal" ]; then
