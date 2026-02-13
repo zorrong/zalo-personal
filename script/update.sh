@@ -92,11 +92,12 @@ echo ""
 echo "🚀 Bắt đầu cập nhật..."
 echo ""
 
-# Backup current version
-BACKUP_DIR="$EXT_DIR.backup-$(date +%Y%m%d-%H%M%S)"
+# Backup current version to /tmp (auto cleanup after reboot)
+BACKUP_DIR="/tmp/zalo-personal-backup-$(date +%Y%m%d-%H%M%S)"
 echo "💾 [1/4] Tạo backup..."
 cp -r "$EXT_DIR" "$BACKUP_DIR"
 echo "   ✅ Backup tại: $BACKUP_DIR"
+echo "   ℹ️  Backup trong /tmp sẽ tự động xóa sau khi reboot"
 echo ""
 
 # Download and extract latest version
@@ -143,13 +144,15 @@ echo "   v$CURRENT_VERSION → v$NEW_VERSION"
 echo ""
 
 # Cleanup backup
-read -p "🗑️  Xóa backup (giữ backup nếu có vấn đề)? (y/n): " CLEANUP
+echo ""
+echo "💡 Backup trong /tmp sẽ tự động xóa sau khi reboot"
+read -p "🗑️  Xóa backup ngay? [Y/n]: " CLEANUP
 
-if [[ "$CLEANUP" =~ ^[Yy]$ ]]; then
+if [[ "$CLEANUP" =~ ^[Nn]$ ]]; then
+    echo "   📁 Backup giữ lại tại: $BACKUP_DIR (xóa sau reboot)"
+else
     rm -rf "$BACKUP_DIR"
     echo "   ✅ Đã xóa backup"
-else
-    echo "   📁 Backup được giữ lại tại: $BACKUP_DIR"
 fi
 
 echo ""
