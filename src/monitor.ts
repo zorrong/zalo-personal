@@ -5,6 +5,7 @@ import type { ResolvedZaloPersonalAccount, ZaloPersonalFriend, ZaloPersonalGroup
 import { getZaloPersonalRuntime } from "./runtime.js";
 import { sendMessageZaloPersonal } from "./send.js";
 import { getApi, getCurrentUid } from "./zalo-client.js";
+import { downloadImagesFromUrls } from "./image-downloader.js";
 
 export type ZaloPersonalMonitorOptions = {
   account: ResolvedZaloPersonalAccount;
@@ -163,8 +164,42 @@ function isGroupAllowed(params: {
 
 function convertToZaloPersonalMessage(msg: Message): ZaloPersonalMessage | null {
   const data = msg.data;
-  const content = typeof data.content === "string" ? data.content : "";
-  if (!content.trim()) {
+  let content = "";
+  const mediaUrls: string[] = [];
+  const mediaTypes: string[] = [];
+
+  // Handle different content types
+  if (typeof data.content === "string") {
+    content = data.content;
+  } else if (typeof data.content === "object" && data.content !== null) {
+    // Handle attachment (image, video, file, etc.)
+    const attachment = data.content as any;
+
+    // Extract media URL from attachment
+    if (attachment.href) {
+      mediaUrls.push(attachment.href);
+
+      // Determine media type based on attachment.type or default to image
+      const attachmentType = attachment.type?.toLowerCase() || "";
+      let mimeType = "application/octet-stream"; // default
+
+      if (attachmentType.includes("photo") || attachmentType.includes("image")) {
+        mimeType = "image/jpeg";
+      } else if (attachmentType.includes("video")) {
+        mimeType = "video/mp4";
+      } else if (attachmentType.includes("audio")) {
+        mimeType = "audio/mpeg";
+      }
+
+      mediaTypes.push(mimeType);
+    }
+
+    // Use title or description as content, or create a placeholder
+    content = attachment.title || attachment.description || "[Media attachment]";
+  }
+
+  // Allow messages with media even if no text content
+  if (!content.trim() && mediaUrls.length === 0) {
     return null;
   }
 
@@ -183,7 +218,9 @@ function convertToZaloPersonalMessage(msg: Message): ZaloPersonalMessage | null 
     msgId: data.msgId,
     cliMsgId: data.cliMsgId,
     type: isGroup ? 1 : 0,
-    content,
+    content: content || "[Media]",
+    mediaUrls: mediaUrls.length > 0 ? mediaUrls : undefined,
+    mediaTypes: mediaTypes.length > 0 ? mediaTypes : undefined,
     timestamp,
     metadata: {
       isGroup,
@@ -336,7 +373,7 @@ async function processMessage(
 
   const peer = isGroup
     ? { kind: "group" as const, id: chatId }
-    : { kind: "group" as const, id: senderId };
+    : { kind: "direct" as const, id: senderId };
 
   const route = core.channel.routing.resolveAgentRoute({
     cfg: config,
@@ -357,13 +394,38 @@ async function processMessage(
     storePath,
     sessionKey: route.sessionKey,
   });
+
+  // Download media URLs to local files for native image support (BEFORE creating body)
+  let localMediaPaths: string[] | undefined;
+  if (message.mediaUrls && message.mediaUrls.length > 0) {
+    console.log(`[zalo-personal] Downloading ${message.mediaUrls.length} images for native image support...`);
+    const downloadedPaths = await downloadImagesFromUrls(message.mediaUrls);
+    localMediaPaths = downloadedPaths.filter((p): p is string => p !== undefined);
+
+    if (localMediaPaths.length > 0) {
+      console.log(`[zalo-personal] Downloaded ${localMediaPaths.length} images:`, localMediaPaths);
+    } else {
+      console.warn(`[zalo-personal] Failed to download any images from:`, message.mediaUrls);
+    }
+  }
+
+  // Append media to body - use LOCAL paths if downloaded, otherwise URLs
+  let bodyForEnvelope = rawBody;
+  const mediaPathsForBody = localMediaPaths && localMediaPaths.length > 0 ? localMediaPaths : message.mediaUrls;
+  if (mediaPathsForBody && mediaPathsForBody.length > 0) {
+    const mediaInfo = mediaPathsForBody.map((path, idx) =>
+      `[Image ${idx + 1}: ${path}]`
+    ).join('\n');
+    bodyForEnvelope = `${rawBody}\n\n${mediaInfo}`;
+  }
+
   const body = core.channel.reply.formatAgentEnvelope({
     channel: "Zalo JS",
     from: fromLabel,
     timestamp: timestamp ? timestamp * 1000 : undefined,
     previousTimestamp,
     envelope: envelopeOptions,
-    body: rawBody,
+    body: bodyForEnvelope,
   });
 
   const ctxPayload = core.channel.reply.finalizeInboundContext({
@@ -384,6 +446,11 @@ async function processMessage(
     MessageSid: message.msgId ?? `${timestamp}`,
     OriginatingChannel: "zalo-personal",
     OriginatingTo: `'zalo-personal':${chatId}`,
+    // Media fields (OpenClaw standard schema)
+    // Use local paths if downloaded, otherwise fall back to URLs
+    MediaUrls: localMediaPaths && localMediaPaths.length > 0 ? localMediaPaths : message.mediaUrls,
+    MediaUrl: localMediaPaths && localMediaPaths.length > 0 ? localMediaPaths[0] : message.mediaUrls?.[0],
+    MediaTypes: message.mediaTypes,
   });
 
   await core.channel.session.recordInboundSession({

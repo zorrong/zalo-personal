@@ -6,14 +6,27 @@ import {
   deleteCredentials,
   hasCredentials,
 } from "./credentials.js";
+import sharp from "sharp";
+import * as fs from "fs";
 
 let apiInstance: API | null = null;
 let currentUid: string | null = null;
 
 export type QrCallback = (event: LoginQRCallbackEvent) => unknown;
 
+// Image metadata getter for zca-js image uploads
+async function imageMetadataGetter(filePath: string) {
+  const data = await fs.promises.readFile(filePath);
+  const metadata = await sharp(data).metadata();
+  return {
+    height: metadata.height || 0,
+    width: metadata.width || 0,
+    size: metadata.size || data.length,
+  };
+}
+
 export async function loginWithQR(callback?: QrCallback): Promise<API> {
-  const zalo = new Zalo({ logging: false });
+  const zalo = new Zalo({ logging: false, imageMetadataGetter });
   const api = await zalo.loginQR(undefined, (event) => {
     if (event.type === LoginQRCallbackEventType.GotLoginInfo && event.data) {
       saveCredentials({
@@ -39,7 +52,7 @@ export async function loginWithCredentials(): Promise<API> {
   if (!creds) {
     throw new Error("No saved credentials found. Login with QR first.");
   }
-  const zalo = new Zalo({ logging: false });
+  const zalo = new Zalo({ logging: false, imageMetadataGetter });
   const api = await zalo.login({
     imei: creds.imei,
     cookie: creds.cookie as any,

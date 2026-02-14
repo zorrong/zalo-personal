@@ -72,6 +72,8 @@ export type ZaloPersonalMessage = {
   cliMsgId?: string;
   type: number;
   content: string;
+  mediaUrls?: string[];    // Media URLs (images, videos, etc.)
+  mediaTypes?: string[];   // MIME types corresponding to mediaUrls
   timestamp: number;
   metadata?: {
     isGroup: boolean;

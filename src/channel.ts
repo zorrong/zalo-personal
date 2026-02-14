@@ -29,7 +29,7 @@ import {
 import { ZaloPersonalConfigSchema } from "./config-schema.js";
 import { zaloPersonalOnboardingAdapter } from "./onboarding.js";
 import { probeZaloPersonal } from "./probe.js";
-import { sendMessageZaloPersonal } from "./send.js";
+import { sendMessageZaloPersonal, isLocalFilePath } from "./send.js";
 import { collectZaloPersonalStatusIssues } from "./status-issues.js";
 import { hasStoredCredentials, loginWithQR } from "./zalo-client.js";
 import { LoginQRCallbackEventType } from "zca-js";
@@ -575,11 +575,13 @@ export const zaloPersonalPlugin: ChannelPlugin<ResolvedZaloPersonalAccount> = {
       }
       return chunks;
     },
-    chunkerMode: "text",
+    chunkerMode: "markdown",
     textChunkLimit: 2000,
     sendText: async ({ to, text, accountId, cfg }) => {
+      console.log(`[zalo-personal] sendText called: to=${to}, text.length=${text?.length}, text.preview=${text?.substring(0, 100)}`);
       const account = resolveZaloPersonalAccountSync({ cfg: cfg, accountId });
       const result = await sendMessageZaloPersonal(to, text);
+      console.log(`[zalo-personal] sendText result: ok=${result.ok}, messageId=${result.messageId}, error=${result.error}`);
       return {
         channel: "zalo-personal",
         ok: result.ok,
@@ -588,8 +590,23 @@ export const zaloPersonalPlugin: ChannelPlugin<ResolvedZaloPersonalAccount> = {
       };
     },
     sendMedia: async ({ to, text, mediaUrl, accountId, cfg }) => {
+      console.log(`[zalo-personal] sendMedia called: to=${to}, mediaUrl=${mediaUrl}, text=${text}`);
       const account = resolveZaloPersonalAccountSync({ cfg: cfg, accountId });
-      const result = await sendMessageZaloPersonal(to, text, { mediaUrl });
+
+      // Check if mediaUrl is actually a local file path
+      let options: any = {};
+      if (mediaUrl && isLocalFilePath(mediaUrl) && fs.existsSync(mediaUrl)) {
+        console.log(`[zalo-personal] Detected local file path in sendMedia: ${mediaUrl}`);
+        options.localPath = mediaUrl;
+        options.caption = text;
+      } else if (mediaUrl) {
+        console.log(`[zalo-personal] Using mediaUrl: ${mediaUrl}`);
+        options.mediaUrl = mediaUrl;
+        options.caption = text;
+      }
+
+      const result = await sendMessageZaloPersonal(to, text, options);
+      console.log(`[zalo-personal] sendMedia result: ok=${result.ok}, messageId=${result.messageId}, error=${result.error}`);
       return {
         channel: "zalo-personal",
         ok: result.ok,

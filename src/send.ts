@@ -1,10 +1,14 @@
 import { ThreadType } from "zca-js";
 import { getApi } from "./zalo-client.js";
+import * as fs from "fs";
+import * as path from "path";
 
 export type ZaloPersonalSendOptions = {
   mediaUrl?: string;
   caption?: string;
   isGroup?: boolean;
+  localPath?: string;  // Local file path to upload
+  cleanupAfterUpload?: boolean;  // Delete local file after upload
 };
 
 export type ZaloPersonalSendResult = {
@@ -20,6 +24,23 @@ export async function sendMessageZaloPersonal(
 ): Promise<ZaloPersonalSendResult> {
   if (!threadId?.trim()) {
     return { ok: false, error: "No threadId provided" };
+  }
+
+  // Handle local file upload (explicit)
+  if (options.localPath) {
+    return uploadAndSendLocalImage(threadId, options.localPath, {
+      ...options,
+      caption: text || options.caption,
+    });
+  }
+
+  // Auto-detect if text is a local file path
+  if (text && isLocalFilePath(text.trim()) && fs.existsSync(text.trim())) {
+    console.log("[zalo-personal] Auto-detected local file path:", text.trim());
+    return uploadAndSendLocalImage(threadId, text.trim(), {
+      ...options,
+      caption: options.caption,
+    });
   }
 
   if (options.mediaUrl) {
@@ -101,4 +122,81 @@ export async function sendLinkZaloPersonal(
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
+}
+
+/**
+ * Upload a local image file to Zalo and send it
+ * @param threadId - Chat thread ID
+ * @param localPath - Local file path to upload
+ * @param options - Send options including caption and cleanup flag
+ */
+async function uploadAndSendLocalImage(
+  threadId: string,
+  localPath: string,
+  options: ZaloPersonalSendOptions = {},
+): Promise<ZaloPersonalSendResult> {
+  console.log("[zalo-personal] uploadAndSendLocalImage called:", { threadId, localPath, options });
+
+  if (!threadId?.trim()) {
+    return { ok: false, error: "No threadId provided" };
+  }
+  if (!localPath?.trim()) {
+    return { ok: false, error: "No local path provided" };
+  }
+
+  // Check if file exists
+  if (!fs.existsSync(localPath)) {
+    console.error(`[zalo-personal] File not found: ${localPath}`);
+    return { ok: false, error: `File not found: ${localPath}` };
+  }
+
+  try {
+    const api = await getApi();
+    const type = options.isGroup ? ThreadType.Group : ThreadType.User;
+
+    console.log(`[zalo-personal] Uploading and sending: ${localPath} to thread ${threadId}`);
+
+    // Send message with attachment - sendMessage will handle the upload internally
+    const result = await api.sendMessage(
+      {
+        msg: options.caption || "",
+        attachments: localPath,  // Pass file path directly
+      },
+      threadId.trim(),
+      type,
+    );
+
+    console.log("[zalo-personal] Send result:", result);
+
+    // Clean up local file after successful send (default: false to avoid race conditions)
+    // OpenClaw's MEDIA: token processing may need the file, so only cleanup when explicitly requested
+    if (options.cleanupAfterUpload === true) {
+      try {
+        fs.unlinkSync(localPath);
+        console.log(`[zalo-personal] Cleaned up local file: ${localPath}`);
+      } catch (cleanupErr) {
+        console.warn(`[zalo-personal] Failed to cleanup ${localPath}:`, cleanupErr);
+      }
+    }
+
+    const msgId = result?.message?.msgId;
+    return { ok: true, messageId: msgId != null ? String(msgId) : undefined };
+  } catch (err) {
+    console.error("[zalo-personal] Upload error:", err);
+    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+/**
+ * Check if a string looks like a local file path
+ */
+export function isLocalFilePath(str: string): boolean {
+  if (!str) return false;
+  // Check if it's an absolute path or relative path pattern
+  return (
+    str.startsWith("/") ||
+    str.startsWith("./") ||
+    str.startsWith("../") ||
+    str.includes("/.openclaw/workspace/")
+  );
 }
